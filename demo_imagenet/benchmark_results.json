@@ -1,0 +1,153 @@
+{
+  "benchmark_info": {
+    "total_time": 3.316082000732422,
+    "device": "cpu",
+    "dataset": "imagenet",
+    "num_models": 1,
+    "num_samples_per_model": 2,
+    "quick_mode": true,
+    "timestamp": 1758341928.83789
+  },
+  "model_results": [
+    {
+      "model_name": "mobilenet_v2",
+      "model_info": {
+        "description": "MobileNet-V2 efficient architecture",
+        "parameters": "~3.5M",
+        "input_size": "(3, 224, 224)",
+        "suitable_for": [
+          "mobile deployment",
+          "edge devices"
+        ]
+      },
+      "num_parameters": 3504872,
+      "model_size_mb": 13.50054931640625,
+      "device": "cpu",
+      "dataset": "imagenet",
+      "num_samples": 2,
+      "xai_results": [
+        {
+          "sample_idx": 0,
+          "predicted_class": 911,
+          "confidence": 0.26587048172950745,
+          "true_label": 0,
+          "true_class_name": "class_0",
+          "is_correct": false,
+          "dataset": "imagenet",
+          "xai_methods": [
+            {
+              "method_name": "Saliency",
+              "processing_time": 0.07794380187988281,
+              "target_class": 911,
+              "confidence": 0.26587048172950745
+            },
+            {
+              "method_name": "Integrated Gradients",
+              "processing_time": 0.9363815784454346,
+              "target_class": 911,
+              "confidence": 0.26587048172950745
+            },
+            {
+              "method_name": "DeepLIFT",
+              "processing_time": 0.0849456787109375,
+              "target_class": 911,
+              "confidence": 0.26587048172950745
+            }
+          ]
+        },
+        {
+          "sample_idx": 1,
+          "predicted_class": 506,
+          "confidence": 0.29900839924812317,
+          "true_label": 1,
+          "true_class_name": "class_1",
+          "is_correct": false,
+          "dataset": "imagenet",
+          "xai_methods": [
+            {
+              "method_name": "Saliency",
+              "processing_time": 0.04842495918273926,
+              "target_class": 506,
+              "confidence": 0.29900839924812317
+            },
+            {
+              "method_name": "Integrated Gradients",
+              "processing_time": 0.9241847991943359,
+              "target_class": 506,
+              "confidence": 0.29900839924812317
+            },
+            {
+              "method_name": "DeepLIFT",
+              "processing_time": 0.07039022445678711,
+              "target_class": 506,
+              "confidence": 0.29900839924812317
+            }
+          ]
+        }
+      ],
+      "hardware_stats": [
+        {
+          "duration_seconds": 1.105381965637207,
+          "avg_cpu_percent": 50.98333333333333,
+          "max_cpu_percent": 55.6,
+          "avg_memory_percent": 20.05,
+          "max_memory_percent": 25.1,
+          "avg_memory_used_gb": 3.1313374837239585,
+          "max_memory_used_gb": 3.9167251586914062,
+          "sample_idx": 0,
+          "model_name": "mobilenet_v2",
+          "operation_duration": 1.1581716537475586
+        },
+        {
+          "duration_seconds": 1.0057172775268555,
+          "avg_cpu_percent": 51.718181818181826,
+          "max_cpu_percent": 65.3,
+          "avg_memory_percent": 23.2,
+          "max_memory_percent": 26.9,
+          "avg_memory_used_gb": 3.6254938299005683,
+          "max_memory_used_gb": 4.199745178222656,
+          "sample_idx": 1,
+          "model_name": "mobilenet_v2",
+          "operation_duration": 1.1010768413543701
+        }
+      ],
+      "total_time": 3.2328765392303467,
+      "summary_stats": {
+        "avg_processing_time_per_method": 0.35704517364501953,
+        "total_processing_time": 2.142271041870117,
+        "method_avg_times": {
+          "Saliency": 0.06318438053131104,
+          "Integrated Gradients": 0.9302831888198853,
+          "DeepLIFT": 0.0776679515838623
+        },
+        "throughput_samples_per_second": 0.6186441009207675
+      }
+    }
+  ],
+  "hardware_results": [
+    {
+      "duration_seconds": 1.105381965637207,
+      "avg_cpu_percent": 50.98333333333333,
+      "max_cpu_percent": 55.6,
+      "avg_memory_percent": 20.05,
+      "max_memory_percent": 25.1,
+      "avg_memory_used_gb": 3.1313374837239585,
+      "max_memory_used_gb": 3.9167251586914062,
+      "sample_idx": 0,
+      "model_name": "mobilenet_v2",
+      "operation_duration": 1.1581716537475586
+    },
+    {
+      "duration_seconds": 1.0057172775268555,
+      "avg_cpu_percent": 51.718181818181826,
+      "max_cpu_percent": 65.3,
+      "avg_memory_percent": 23.2,
+      "max_memory_percent": 26.9,
+      "avg_memory_used_gb": 3.6254938299005683,
+      "max_memory_used_gb": 4.199745178222656,
+      "sample_idx": 1,
+      "model_name": "mobilenet_v2",
+      "operation_duration": 1.1010768413543701
+    }
+  ]
+}

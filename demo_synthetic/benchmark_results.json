@@ -1,0 +1,153 @@
+{
+  "benchmark_info": {
+    "total_time": 1.045180320739746,
+    "device": "cpu",
+    "dataset": "synthetic",
+    "num_models": 1,
+    "num_samples_per_model": 2,
+    "quick_mode": true,
+    "timestamp": 1758341921.8340352
+  },
+  "model_results": [
+    {
+      "model_name": "simple_cnn",
+      "model_info": {
+        "description": "Simple 4-layer CNN",
+        "parameters": "~2M",
+        "input_size": "(3, 32, 32)",
+        "suitable_for": [
+          "CIFAR-10",
+          "small datasets"
+        ]
+      },
+      "num_parameters": 3000040,
+      "model_size_mb": 11.44793701171875,
+      "device": "cpu",
+      "dataset": "synthetic",
+      "num_samples": 2,
+      "xai_results": [
+        {
+          "sample_idx": 0,
+          "predicted_class": 357,
+          "confidence": 0.001057298039086163,
+          "true_label": null,
+          "true_class_name": null,
+          "is_correct": null,
+          "dataset": "synthetic",
+          "xai_methods": [
+            {
+              "method_name": "Saliency",
+              "processing_time": 0.005175352096557617,
+              "target_class": 357,
+              "confidence": 0.001057298039086163
+            },
+            {
+              "method_name": "Integrated Gradients",
+              "processing_time": 0.04105687141418457,
+              "target_class": 357,
+              "confidence": 0.001057298039086163
+            },
+            {
+              "method_name": "DeepLIFT",
+              "processing_time": 0.012678146362304688,
+              "target_class": 357,
+              "confidence": 0.001057298039086163
+            }
+          ]
+        },
+        {
+          "sample_idx": 1,
+          "predicted_class": 357,
+          "confidence": 0.0010580081725493073,
+          "true_label": null,
+          "true_class_name": null,
+          "is_correct": null,
+          "dataset": "synthetic",
+          "xai_methods": [
+            {
+              "method_name": "Saliency",
+              "processing_time": 0.005326271057128906,
+              "target_class": 357,
+              "confidence": 0.0010580081725493073
+            },
+            {
+              "method_name": "Integrated Gradients",
+              "processing_time": 0.03282737731933594,
+              "target_class": 357,
+              "confidence": 0.0010580081725493073
+            },
+            {
+              "method_name": "DeepLIFT",
+              "processing_time": 0.009450674057006836,
+              "target_class": 357,
+              "confidence": 0.0010580081725493073
+            }
+          ]
+        }
+      ],
+      "hardware_stats": [
+        {
+          "duration_seconds": 0.0,
+          "avg_cpu_percent": 0.0,
+          "max_cpu_percent": 0.0,
+          "avg_memory_percent": 11.8,
+          "max_memory_percent": 11.8,
+          "avg_memory_used_gb": 1.8466339111328125,
+          "max_memory_used_gb": 1.8466339111328125,
+          "sample_idx": 0,
+          "model_name": "simple_cnn",
+          "operation_duration": 0.06421875953674316
+        },
+        {
+          "duration_seconds": 0.0,
+          "avg_cpu_percent": 66.5,
+          "max_cpu_percent": 66.5,
+          "avg_memory_percent": 12.2,
+          "max_memory_percent": 12.2,
+          "avg_memory_used_gb": 1.90484619140625,
+          "max_memory_used_gb": 1.90484619140625,
+          "sample_idx": 1,
+          "model_name": "simple_cnn",
+          "operation_duration": 0.053156375885009766
+        }
+      ],
+      "total_time": 1.0258493423461914,
+      "summary_stats": {
+        "avg_processing_time_per_method": 0.017752448717753094,
+        "total_processing_time": 0.10651469230651855,
+        "method_avg_times": {
+          "Saliency": 0.005250811576843262,
+          "Integrated Gradients": 0.036942124366760254,
+          "DeepLIFT": 0.011064410209655762
+        },
+        "throughput_samples_per_second": 1.9496040182916683
+      }
+    }
+  ],
+  "hardware_results": [
+    {
+      "duration_seconds": 0.0,
+      "avg_cpu_percent": 0.0,
+      "max_cpu_percent": 0.0,
+      "avg_memory_percent": 11.8,
+      "max_memory_percent": 11.8,
+      "avg_memory_used_gb": 1.8466339111328125,
+      "max_memory_used_gb": 1.8466339111328125,
+      "sample_idx": 0,
+      "model_name": "simple_cnn",
+      "operation_duration": 0.06421875953674316
+    },
+    {
+      "duration_seconds": 0.0,
+      "avg_cpu_percent": 66.5,
+      "max_cpu_percent": 66.5,
+      "avg_memory_percent": 12.2,
+      "max_memory_percent": 12.2,
+      "avg_memory_used_gb": 1.90484619140625,
+      "max_memory_used_gb": 1.90484619140625,
+      "sample_idx": 1,
+      "model_name": "simple_cnn",
+      "operation_duration": 0.053156375885009766
+    }
+  ]
+}
