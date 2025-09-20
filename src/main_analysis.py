@@ -16,6 +16,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
+import torchvision.transforms as transforms
 
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -23,19 +24,20 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from models.model_definitions import ModelFactory, count_parameters, get_model_size_mb
 from xai.captum_methods import CaptumXAI, XAIResult, visualize_attributions
 from monitoring.hardware_monitor import HardwareMonitor, BenchmarkTimer
-from utils.data_utils import get_sample_images, visualize_batch, get_model_input_size
+from utils.data_utils import get_sample_images, get_real_data_samples, visualize_batch, get_model_input_size
 
 
 class XAIBenchmark:
     """Comprehensive XAI benchmarking with hardware monitoring."""
     
-    def __init__(self, output_dir: str = "results", device: str = None):
+    def __init__(self, output_dir: str = "results", device: str = None, dataset: str = "synthetic"):
         """
         Initialize XAI benchmark.
         
         Args:
             output_dir: Directory to save results
             device: Device to run on ('cpu', 'cuda', or None for auto)
+            dataset: Dataset to use ('synthetic', 'cifar10', 'imagenet')
         """
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
@@ -46,7 +48,14 @@ class XAIBenchmark:
         else:
             self.device = device
         
+        # Dataset selection
+        self.dataset = dataset.lower()
+        if self.dataset not in ['synthetic', 'cifar10', 'imagenet']:
+            print(f"Warning: Unknown dataset '{dataset}'. Using 'synthetic' instead.")
+            self.dataset = 'synthetic'
+        
         print(f"Using device: {self.device}")
+        print(f"Using dataset: {self.dataset}")
         
         # Initialize hardware monitor
         self.hardware_monitor = HardwareMonitor(sampling_interval=0.1)
@@ -89,13 +98,32 @@ class XAIBenchmark:
             print(f"Parameters: {num_params:,}")
             print(f"Size: {model_size_mb:.2f} MB")
             
-            # Generate sample data
-            input_size = get_model_input_size(model_name)
-            sample_images = get_sample_images(
-                num_samples=num_samples, 
-                image_size=input_size, 
-                device=self.device
-            )
+            # Load sample data based on dataset choice
+            if self.dataset == 'synthetic':
+                input_size = get_model_input_size(model_name)
+                sample_images = get_sample_images(
+                    num_samples=num_samples, 
+                    image_size=input_size, 
+                    device=self.device
+                )
+                sample_labels = torch.randint(0, 1000, (num_samples,), device=self.device)
+                class_names = [f"synthetic_class_{i}" for i in range(1000)]
+            else:
+                # Use real dataset
+                sample_images, sample_labels, class_names = get_real_data_samples(
+                    dataset_name=self.dataset,
+                    num_samples=num_samples,
+                    device=self.device
+                )
+                
+                # Resize images if needed for the model
+                input_size = get_model_input_size(model_name)
+                if sample_images.shape[-1] != input_size[0] or sample_images.shape[-2] != input_size[1]:
+                    print(f"Resizing images from {sample_images.shape[-2:]} to {input_size}")
+                    resize_transform = transforms.Resize(input_size)
+                    sample_images = torch.stack([resize_transform(img) for img in sample_images])
+            
+            print(f"Loaded {len(sample_images)} samples from {self.dataset} dataset")
             
             # Initialize XAI analyzer
             xai_analyzer = CaptumXAI(model, self.device)
@@ -107,6 +135,7 @@ class XAIBenchmark:
                 'num_parameters': num_params,
                 'model_size_mb': model_size_mb,
                 'device': self.device,
+                'dataset': self.dataset,
                 'num_samples': num_samples,
                 'xai_results': [],
                 'hardware_stats': [],
@@ -122,8 +151,20 @@ class XAIBenchmark:
                 # Get prediction info
                 output, predicted_class, confidence = xai_analyzer.get_prediction(sample_image)
                 
-                print(f"\nSample {sample_idx + 1}: Predicted class {predicted_class} "
-                      f"(confidence: {confidence:.3f})")
+                # Get true label if using real dataset
+                if self.dataset != 'synthetic':
+                    true_label = sample_labels[sample_idx].item()
+                    true_class_name = class_names[true_label] if true_label < len(class_names) else f"class_{true_label}"
+                    is_correct = predicted_class == true_label
+                    print(f"\nSample {sample_idx + 1}: True class {true_label} ({true_class_name}), "
+                          f"Predicted class {predicted_class} (confidence: {confidence:.3f}) - "
+                          f"{'✓ CORRECT' if is_correct else '✗ INCORRECT'}")
+                else:
+                    true_label = None
+                    true_class_name = None
+                    is_correct = None
+                    print(f"\nSample {sample_idx + 1}: Predicted class {predicted_class} "
+                          f"(confidence: {confidence:.3f})")
                 
                 # Benchmark XAI methods
                 with BenchmarkTimer(self.hardware_monitor, f"{model_name}_sample_{sample_idx}") as timer:
@@ -155,6 +196,10 @@ class XAIBenchmark:
                     'sample_idx': sample_idx,
                     'predicted_class': predicted_class,
                     'confidence': confidence,
+                    'true_label': true_label,
+                    'true_class_name': true_class_name,
+                    'is_correct': is_correct,
+                    'dataset': self.dataset,
                     'xai_methods': []
                 }
                 
@@ -234,6 +279,7 @@ class XAIBenchmark:
         print(f"Samples per model: {num_samples}")
         print(f"Quick mode: {quick_mode}")
         print(f"Device: {self.device}")
+        print(f"Dataset: {self.dataset}")
         
         benchmark_start_time = time.time()
         
@@ -248,6 +294,7 @@ class XAIBenchmark:
             'benchmark_info': {
                 'total_time': total_benchmark_time,
                 'device': self.device,
+                'dataset': self.dataset,
                 'num_models': len(model_names),
                 'num_samples_per_model': num_samples,
                 'quick_mode': quick_mode,
@@ -452,11 +499,15 @@ def main():
                        help='Output directory')
     parser.add_argument('--device', type=str, choices=['cpu', 'cuda'], default=None,
                        help='Device to use (auto-detect if not specified)')
+    parser.add_argument('--dataset', type=str, 
+                       choices=['synthetic', 'cifar10', 'imagenet'], 
+                       default='synthetic',
+                       help='Dataset to use for evaluation (default: synthetic)')
     
     args = parser.parse_args()
     
     # Create benchmark instance
-    benchmark = XAIBenchmark(output_dir=args.output, device=args.device)
+    benchmark = XAIBenchmark(output_dir=args.output, device=args.device, dataset=args.dataset)
     
     # Run benchmark
     results = benchmark.run_full_benchmark(

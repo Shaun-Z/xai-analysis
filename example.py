@@ -14,8 +14,8 @@ def run_quick_example():
     print("Running XAI Analysis Example")
     print("=" * 50)
     
-    # Create benchmark with limited scope
-    benchmark = XAIBenchmark(output_dir="example_results")
+    # Create benchmark with limited scope - demonstrate real dataset usage
+    benchmark = XAIBenchmark(output_dir="example_results", dataset="cifar10")
     
     # Run benchmark on a small set of models
     results = benchmark.run_full_benchmark(
