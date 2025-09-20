@@ -212,3 +212,6 @@ example_results/
 comprehensive_results/
 cli_test_results/
 *_results/
+
+# Config files
+.vscode/
