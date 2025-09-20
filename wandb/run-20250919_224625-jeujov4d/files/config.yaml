@@ -1,0 +1,100 @@
+_wandb:
+    value:
+        cli_version: 0.22.0
+        e:
+            zts4s6a7lt5i58t3msp521l3cibtttl8:
+                args:
+                    - --model
+                    - cifar_cnn
+                    - --dataset
+                    - cifar10
+                    - --epochs
+                    - "20"
+                    - --batch-size
+                    - "128"
+                codePath: train.py
+                codePathLocal: train.py
+                cpu_count: 16
+                cpu_count_logical: 24
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "491002707968"
+                        used: "146780651520"
+                email: xiangyuzhou823@gmail.com
+                executable: /home/xiangyu/miniconda3/envs/xai/bin/python
+                git:
+                    commit: 339d61f12fff4b0d0e35542f18869f3e28c02ea9
+                    remote: git@github.com:Shaun-Z/xai-analysis.git
+                gpu: NVIDIA GeForce RTX 4080
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Ada
+                      cudaCores: 9728
+                      memoryTotal: "17171480576"
+                      name: NVIDIA GeForce RTX 4080
+                      uuid: GPU-d184dffa-10ca-a37b-15dc-e12f922fff67
+                host: xiangyu-msi
+                memory:
+                    total: "67103526912"
+                os: Linux-6.14.0-29-generic-x86_64-with-glibc2.39
+                program: /media/xiangyu/Data/Projects/xai-analysis/train.py
+                python: CPython 3.12.11
+                root: /media/xiangyu/Data/Projects/xai-analysis
+                startedAt: "2025-09-20T05:46:25.405016Z"
+                writerId: zts4s6a7lt5i58t3msp521l3cibtttl8
+        m: []
+        python_version: 3.12.11
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+                - 41
+                - 51
+            "3":
+                - 2
+                - 13
+                - 16
+            "4": 3.12.11
+            "5": 0.22.0
+            "12": 0.22.0
+            "13": linux-x86_64
+batch_size:
+    value: 128
+checkpoint_dir:
+    value: checkpoints
+dataset:
+    value: cifar10
+device:
+    value: auto
+epochs:
+    value: 20
+experiment_name:
+    value: cifar_cnn_cifar10_1758347185
+lr:
+    value: 0.001
+model:
+    value: cifar_cnn
+momentum:
+    value: 0.9
+no_wandb:
+    value: false
+num_workers:
+    value: 4
+optimizer:
+    value: Adam
+resume:
+    value: null
+save_every:
+    value: 5
+scheduler:
+    value: null
+seed:
+    value: 42
+wandb_entity:
+    value: null
+wandb_project:
+    value: xai-analysis
+weight_decay:
+    value: 0

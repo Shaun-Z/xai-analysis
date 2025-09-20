@@ -1,0 +1,50 @@
+{
+  "os":  "Linux-6.14.0-29-generic-x86_64-with-glibc2.39",
+  "python":  "CPython 3.12.11",
+  "startedAt":  "2025-09-20T05:46:25.405016Z",
+  "args":  [
+    "--model",
+    "cifar_cnn",
+    "--dataset",
+    "cifar10",
+    "--epochs",
+    "20",
+    "--batch-size",
+    "128"
+  ],
+  "program":  "/media/xiangyu/Data/Projects/xai-analysis/train.py",
+  "codePath":  "train.py",
+  "codePathLocal":  "train.py",
+  "git":  {
+    "remote":  "git@github.com:Shaun-Z/xai-analysis.git",
+    "commit":  "339d61f12fff4b0d0e35542f18869f3e28c02ea9"
+  },
+  "email":  "xiangyuzhou823@gmail.com",
+  "root":  "/media/xiangyu/Data/Projects/xai-analysis",
+  "host":  "xiangyu-msi",
+  "executable":  "/home/xiangyu/miniconda3/envs/xai/bin/python",
+  "cpu_count":  16,
+  "cpu_count_logical":  24,
+  "gpu":  "NVIDIA GeForce RTX 4080",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "491002707968",
+      "used":  "146780651520"
+    }
+  },
+  "memory":  {
+    "total":  "67103526912"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 4080",
+      "memoryTotal":  "17171480576",
+      "cudaCores":  9728,
+      "architecture":  "Ada",
+      "uuid":  "GPU-d184dffa-10ca-a37b-15dc-e12f922fff67"
+    }
+  ],
+  "cudaVersion":  "13.0",
+  "writerId":  "zts4s6a7lt5i58t3msp521l3cibtttl8"
+}

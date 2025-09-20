@@ -1,0 +1,19 @@
+# Training Framework Requirements
+
+# Core PyTorch and ML libraries
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# Experiment tracking and visualization
+wandb>=0.15.0
+
+# Data science and utilities
+numpy>=1.21.0
+matplotlib>=3.5.0
+pillow>=8.3.0
+
+# Optional: For advanced features
+# scikit-learn>=1.0.0  # For additional metrics
+# tensorboard>=2.10.0  # Alternative to Wandb
+# opencv-python>=4.5.0  # For advanced image processing
