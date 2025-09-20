@@ -6,10 +6,11 @@ This project implements comprehensive XAI (Explainable AI) analysis using the Ca
 
 - **Multiple Model Architectures**: CNN, ResNet (18/50/101), MobileNet (v2/v3), EfficientNet, VGG16
 - **Comprehensive XAI Methods**: Integrated Gradients, SHAP, DeepLIFT, Saliency, Occlusion, LIME, and more
+- **Real Dataset Support**: CIFAR-10, ImageNet-like datasets, and synthetic data for comparison
 - **Hardware Performance Monitoring**: CPU, memory, GPU utilization, power consumption, and throughput
 - **Automated Benchmarking**: Run comprehensive analysis across multiple models and samples
 - **Visualization**: Generate attribution visualizations and performance comparison plots
-- **Detailed Reporting**: JSON results and comprehensive analysis reports
+- **Detailed Reporting**: JSON results with accuracy metrics, true labels, and comprehensive analysis reports
 
 ## Installation
 
@@ -28,20 +29,30 @@ Note: For GPU monitoring, ensure you have NVIDIA drivers and nvidia-ml-py3 insta
 
 ## Quick Start
 
-Run a simple example:
+Run a simple example with CIFAR-10 dataset:
 ```bash
 python example.py
 ```
 
-This will run XAI analysis on a subset of models with hardware monitoring and save results to `example_results/`.
+This will run XAI analysis on a subset of models using CIFAR-10-like data with hardware monitoring and save results to `example_results/`.
+
+For synthetic data comparison:
+```bash
+python src/main_analysis.py --dataset synthetic --models simple_cnn --samples 3
+```
 
 ## Advanced Usage
 
-### Full Benchmark
+### Full Benchmark with Real Datasets
 
-Run comprehensive analysis on all models:
+Run comprehensive analysis with CIFAR-10 dataset:
 ```bash
-python src/main_analysis.py --models simple_cnn resnet18 resnet50 mobilenet_v2 --samples 5
+python src/main_analysis.py --dataset cifar10 --models simple_cnn --samples 5
+```
+
+Run analysis with ImageNet-like dataset:
+```bash
+python src/main_analysis.py --dataset imagenet --models mobilenet_v2 resnet18 --samples 5
 ```
 
 ### Command Line Options
@@ -52,10 +63,19 @@ python src/main_analysis.py [OPTIONS]
 Options:
   --models MODEL [MODEL ...]    Models to benchmark (default: simple_cnn resnet18 mobilenet_v2)
   --samples INT                 Number of samples per model (default: 3)
+  --dataset {synthetic,cifar10,imagenet}  Dataset to use (default: synthetic)
   --quick                       Use quick mode for faster analysis
   --output DIR                  Output directory (default: results)
   --device {cpu,cuda}           Device to use (auto-detect if not specified)
 ```
+
+### Available Datasets
+
+- `synthetic`: Generated synthetic images with structured patterns (default)
+- `cifar10`: CIFAR-10 dataset or CIFAR-10-like synthetic data (32x32 images, 10 classes)
+- `imagenet`: ImageNet-like synthetic data (224x224 images, 1000 classes)
+
+**Note**: When real CIFAR-10 cannot be downloaded, the system automatically creates CIFAR-10-like synthetic data with realistic class-specific patterns (airplanes, automobiles, etc.).
 
 ### Available Models
 
@@ -92,7 +112,7 @@ The system monitors:
 
 ```
 results/
-├── benchmark_results.json          # Complete benchmark data
+├── benchmark_results.json          # Complete benchmark data with accuracy metrics
 ├── performance_comparison.png      # Performance comparison plots
 ├── hardware_monitoring.png         # Hardware usage plots
 └── [model]_sample_[n]_[method].png # Individual attribution visualizations
@@ -102,18 +122,56 @@ results/
 
 The system generates:
 
-1. **JSON Results**: Complete benchmark data with timing, hardware stats, and method performance
+1. **JSON Results**: Complete benchmark data with timing, hardware stats, method performance, and dataset-specific information:
+   - True labels and class names (for real datasets)
+   - Prediction accuracy and confidence scores
+   - Dataset type used for each benchmark
+   - Model-specific performance metrics
+
 2. **Performance Plots**: Bar charts comparing processing times and throughput across models
 3. **Hardware Plots**: Box plots showing CPU, memory, and GPU usage patterns
 4. **Attribution Visualizations**: Heatmaps showing XAI method outputs for each sample
 
+### Dataset-Specific Features
+
+When using real datasets, the results include:
+- **True Labels**: Actual class labels from the dataset
+- **Class Names**: Human-readable class names (e.g., "airplane", "automobile" for CIFAR-10)
+- **Accuracy Metrics**: Whether predictions match true labels
+- **Dataset Information**: Which dataset was used for each benchmark
+
+## Example Usage
+
+### Compare Models on Different Datasets
+
+```bash
+# Test simple CNN on CIFAR-10-like data
+python src/main_analysis.py --dataset cifar10 --models simple_cnn --samples 3
+
+# Test multiple models on ImageNet-like data  
+python src/main_analysis.py --dataset imagenet --models mobilenet_v2 resnet18 --samples 3
+
+# Compare with synthetic data
+python src/main_analysis.py --dataset synthetic --models simple_cnn mobilenet_v2 --samples 3
+```
+
+### Comprehensive Multi-Dataset Analysis
+
+```bash
+# Run comprehensive test across all datasets
+python comprehensive_test.py
+```
+
+This will create separate result directories for CIFAR-10, ImageNet-like, and synthetic datasets, allowing for direct comparison of model performance across different data distributions.
+
 ## Example Results
 
 The benchmark provides insights such as:
-- Which models are most efficient for XAI analysis
-- Hardware resource requirements for different model sizes
-- Comparative performance of various XAI methods
-- Memory and compute bottlenecks
+- Which models are most efficient for XAI analysis on real vs. synthetic data
+- How model accuracy differs between datasets  
+- Hardware resource requirements for different model sizes and data types
+- Comparative performance of various XAI methods across datasets
+- Memory and compute bottlenecks for different data distributions
 
 ## Contributing
 
