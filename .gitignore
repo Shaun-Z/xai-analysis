@@ -1,7 +1,17 @@
 .results/
 .vscode/
+
+# Training data and outputs
 data/
-models/
+checkpoints/
+logs/
+runs/
+*.pth
+*.pt
+
+# Keep models directory structure but ignore any saved models
+models/*.pth
+models/*.pt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

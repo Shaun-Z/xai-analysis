@@ -1,0 +1,29 @@
+# Configuration for training Net model on CIFAR-10
+model: "net"
+dataset: "cifar10"
+augmented: false
+
+# Training hyperparameters
+epochs: 20
+batch_size: 32
+lr: 0.001
+momentum: 0.9
+weight_decay: 0.0001
+optimizer: "sgd"
+
+# Learning rate scheduler
+scheduler: "step"
+step_size: 10
+gamma: 0.1
+
+# Data and I/O
+data_root: "./data"
+checkpoint_dir: "./checkpoints/cifar10_net"
+log_dir: "./logs"
+
+# Other options
+num_workers: 2
+print_freq: 100
+save_freq: 5
+tensorboard: true
+tensorboard_dir: "./runs/cifar10_net"
