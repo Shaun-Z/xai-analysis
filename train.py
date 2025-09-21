@@ -32,11 +32,11 @@ def parse_args():
                        help='Dataset name (Python module in datasets/ folder)')
     
     # Training parameters
-    parser.add_argument('--epochs', type=int, default=10,
+    parser.add_argument('--epochs', type=int, default=80,
                        help='Number of training epochs')
     parser.add_argument('--batch-size', type=int, default=32,
                        help='Batch size for training')
-    parser.add_argument('--lr', type=float, default=0.001,
+    parser.add_argument('--lr', type=float, default=0.0001,
                        help='Learning rate')
     parser.add_argument('--weight-decay', type=float, default=0.0,
                        help='Weight decay (L2 regularization)')
@@ -315,7 +315,9 @@ def main():
     
     # Set up experiment name
     if args.experiment_name is None:
-        args.experiment_name = f"{args.model}_{args.dataset}_{int(time.time())}"
+        from datetime import datetime
+        date_str = datetime.now().strftime("%Y%m%d_%H%M")
+        args.experiment_name = f"{args.model}_{args.dataset}_{date_str}"
     
     # Set seed for reproducibility
     set_seed(args.seed)
