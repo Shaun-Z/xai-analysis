@@ -14,10 +14,12 @@ The project combines explainable AI research with practical model training capab
 ```
 xai-analysis/
 ├── train.py                          # Main training script
+├── explain.py                        # XAI explanation script using Captum
 ├── CIFAR_TorchVision_Interpret.ipynb # XAI analysis notebook
+├── EXPLANATION_GUIDE.md              # Detailed explanation usage guide
 ├── models/                           # Model definitions
 │   ├── __init__.py
-│   ├── cifar_cnn.py                  # Simple CNN for CIFAR-10
+│   ├── cifar_cnn.py                  # Enhanced CNN for CIFAR-10
 │   ├── resnet.py                     # ResNet architectures
 │   └── cifar_torchvision.pt          # Pre-trained model
 ├── datasets/                         # Dataset loaders
@@ -25,6 +27,14 @@ xai-analysis/
 │   ├── cifar10.py                    # CIFAR-10 dataset
 │   └── cifar100.py                   # CIFAR-100 dataset
 ├── checkpoints/                      # Training checkpoints
+│   └── experiment_name/              # Organized by experiment
+│       ├── epoch_X.pt                # Regular checkpoints
+│       └── best_model.pt             # Best model checkpoint
+├── results/                          # XAI explanation results
+│   └── experiment_name/              # Organized by experiment
+│       ├── attributions/             # Raw attribution tensors
+│       ├── visualizations/           # Attribution heatmaps
+│       └── reports/                  # JSON analysis reports
 ├── data/                            # Raw data storage
 │   └── cifar-10-batches-py/         # CIFAR-10 data
 ├── requirements.txt                  # Python dependencies
@@ -96,9 +106,61 @@ python train.py \
     --resume checkpoints/resnet18_cifar10_experiment/best_model.pt
 ```
 
-### XAI Analysis
+### Explainable AI Analysis
 
-Open and run the Jupyter notebook for XAI analysis:
+The project includes a comprehensive explanation framework using Captum for model interpretability:
+
+#### Basic Explanation
+
+Explain model predictions using default methods:
+```bash
+python explain.py --model cifar_cnn --dataset cifar10 --checkpoint checkpoints/best_model.pt
+```
+
+#### Advanced Explanation
+
+Use multiple attribution methods with custom settings:
+```bash
+python explain.py \
+    --model cifar_cnn \
+    --dataset cifar10 \
+    --checkpoint checkpoints/cifar_cnn_cifar10/best_model.pt \
+    --methods integrated_gradients saliency gradcam deeplift gradient_shap \
+    --num-samples 10 \
+    --n-steps 100 \
+    --experiment-name comprehensive_analysis
+```
+
+#### Available Attribution Methods
+
+- **Integrated Gradients**: Path-based attribution with high fidelity
+- **Saliency Maps**: Simple gradient-based attribution
+- **GradCAM**: Class activation mapping for CNNs
+- **DeepLift**: Activation difference attribution
+- **Gradient SHAP**: Game-theoretic explanations
+- **Occlusion**: Systematic input masking
+- **LRP**: Layer-wise relevance propagation
+
+#### Understanding Results
+
+Results are saved in organized directories:
+```
+results/experiment_name/
+├── attributions/          # Raw attribution tensors (.pt files)
+├── visualizations/        # Attribution heatmaps (.png files)
+└── reports/              # JSON reports with metadata
+```
+
+Each visualization shows:
+1. Original image with true/predicted labels
+2. Attribution heatmap (red=positive, blue=negative)
+3. Overlay of attribution on original image
+
+For detailed usage instructions, see [EXPLANATION_GUIDE.md](EXPLANATION_GUIDE.md).
+
+### XAI Analysis Notebook
+
+Open and run the Jupyter notebook for interactive XAI analysis:
 ```bash
 jupyter notebook CIFAR_TorchVision_Interpret.ipynb
 ```
