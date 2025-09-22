@@ -1,0 +1,12 @@
+# Additional requirements for hardware performance benchmarking
+# Add these to your existing requirements.txt
+
+# Hardware monitoring
+psutil>=5.8.0          # System and process monitoring
+pynvml>=11.4.1         # NVIDIA GPU monitoring
+pandas>=1.3.0          # Data analysis and reporting
+matplotlib>=3.5.0      # Plotting and visualization
+seaborn>=0.11.0        # Statistical visualization (optional)
+
+# Memory profiling is built into Python 3.4+
+# tracemalloc is part of the standard library
