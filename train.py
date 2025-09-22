@@ -30,6 +30,8 @@ def parse_args():
                        help='Model name (Python module in models/ folder)')
     parser.add_argument('--dataset', type=str, required=True,
                        help='Dataset name (Python module in datasets/ folder)')
+    parser.add_argument('--data-dir', type=str, default=None,
+                       help='Data directory path (if not specified, dataset defaults will be used)')
     
     # Training parameters
     parser.add_argument('--epochs', type=int, default=80,
@@ -103,17 +105,34 @@ def set_seed(seed):
     random.seed(seed)
 
 
-def load_model(model_name, device):
+def load_model(model_name, device, num_classes=None):
     """Dynamically load model from models/ folder."""
     try:
         model_module = importlib.import_module(f'models.{model_name}')
         # Look for common model creation functions/classes
         if hasattr(model_module, 'create_model'):
-            model = model_module.create_model()
+            if num_classes is not None:
+                model = model_module.create_model(num_classes=num_classes)
+            else:
+                model = model_module.create_model()
+        elif hasattr(model_module, f'create_{model_name}'):
+            create_func = getattr(model_module, f'create_{model_name}')
+            if num_classes is not None:
+                model = create_func(num_classes=num_classes)
+            else:
+                model = create_func()
         elif hasattr(model_module, 'Model'):
-            model = model_module.Model()
-        elif hasattr(model_module, 'Net'):
-            model = model_module.Net()
+            if num_classes is not None:
+                model = model_module.Model(num_classes=num_classes)
+            else:
+                model = model_module.Model()
+        elif hasattr(model_module, model_name.split('_')[-1].title()):
+            # For ResNet50 -> ResNet50 class
+            model_class = getattr(model_module, model_name.split('_')[-1].title())
+            if num_classes is not None:
+                model = model_class(num_classes=num_classes)
+            else:
+                model = model_class()
         else:
             # Try to find the first class that inherits from nn.Module
             for attr_name in dir(model_module):
@@ -121,8 +140,16 @@ def load_model(model_name, device):
                 if (isinstance(attr, type) and 
                     issubclass(attr, nn.Module) and 
                     attr != nn.Module):
-                    model = attr()
-                    break
+                    if num_classes is not None:
+                        try:
+                            model = attr(num_classes=num_classes)
+                            break
+                        except TypeError:
+                            model = attr()
+                            break
+                    else:
+                        model = attr()
+                        break
             else:
                 raise ValueError(f"No suitable model class found in {model_name}")
         
@@ -131,24 +158,53 @@ def load_model(model_name, device):
         raise ImportError(f"Could not import model '{model_name}' from models/{model_name}.py")
 
 
-def load_dataset(dataset_name, batch_size, num_workers):
+def load_dataset(dataset_name, batch_size, num_workers, data_dir=None):
     """Dynamically load dataset from datasets/ folder."""
     try:
         dataset_module = importlib.import_module(f'datasets.{dataset_name}')
         
         # Look for common dataset creation functions
         if hasattr(dataset_module, 'get_dataloaders'):
-            train_loader, val_loader = dataset_module.get_dataloaders(
-                batch_size=batch_size, num_workers=num_workers
-            )
+            if data_dir is not None:
+                result = dataset_module.get_dataloaders(
+                    data_dir, batch_size=batch_size, num_workers=num_workers
+                )
+            else:
+                result = dataset_module.get_dataloaders(
+                    batch_size=batch_size, num_workers=num_workers
+                )
         elif hasattr(dataset_module, 'create_dataloaders'):
-            train_loader, val_loader = dataset_module.create_dataloaders(
-                batch_size=batch_size, num_workers=num_workers
-            )
+            if data_dir is not None:
+                result = dataset_module.create_dataloaders(
+                    data_dir, batch_size=batch_size, num_workers=num_workers
+                )
+            else:
+                result = dataset_module.create_dataloaders(
+                    batch_size=batch_size, num_workers=num_workers
+                )
+        elif hasattr(dataset_module, f'create_{dataset_name}_dataloaders'):
+            create_func = getattr(dataset_module, f'create_{dataset_name}_dataloaders')
+            if data_dir is not None:
+                result = create_func(
+                    data_dir, batch_size=batch_size, num_workers=num_workers
+                )
+            else:
+                result = create_func(
+                    batch_size=batch_size, num_workers=num_workers
+                )
         else:
             raise ValueError(f"No suitable dataloader function found in {dataset_name}")
         
-        return train_loader, val_loader
+        # Handle different return formats
+        if len(result) == 2:
+            train_loader, val_loader = result
+            return train_loader, val_loader, None
+        elif len(result) == 3:
+            train_loader, val_loader, num_classes = result
+            return train_loader, val_loader, num_classes
+        else:
+            raise ValueError(f"Unexpected return format from dataset {dataset_name}")
+            
     except ImportError:
         raise ImportError(f"Could not import dataset '{dataset_name}' from datasets/{dataset_name}.py")
 
@@ -336,12 +392,20 @@ def main():
         )
     
     try:
-        # Load model and dataset
-        print(f"Loading model: {args.model}")
-        model = load_model(args.model, device)
-        
+        # Load dataset first to get num_classes
         print(f"Loading dataset: {args.dataset}")
-        train_loader, val_loader = load_dataset(args.dataset, args.batch_size, args.num_workers)
+        # Use specified data directory or defaults
+        data_dir = args.data_dir
+        if data_dir is None and args.dataset == 'imagenets50':
+            data_dir = 'data/imagenets50'
+        
+        train_loader, val_loader, num_classes = load_dataset(
+            args.dataset, args.batch_size, args.num_workers, data_dir
+        )
+        
+        # Load model with num_classes if available
+        print(f"Loading model: {args.model}")
+        model = load_model(args.model, device, num_classes)
         
         # Create optimizer and scheduler
         optimizer = create_optimizer(
