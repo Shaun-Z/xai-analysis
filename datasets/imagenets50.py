@@ -127,6 +127,11 @@ def create_imagenets50_dataloaders(data_dir, batch_size=32, input_size=224, num_
     return train_loader, val_loader, train_dataset.get_num_classes()
 
 
+def get_dataloaders(data_dir='data/imagenets50', batch_size=32, input_size=224, num_workers=4):
+    """Standard function name for compatibility with explain.py."""
+    return create_imagenets50_dataloaders(data_dir, batch_size, input_size, num_workers)
+
+
 def get_class_info(data_dir):
     """Get class information for ImageNet50 dataset."""
     train_dataset = ImageNets50Dataset(data_dir, split='train')

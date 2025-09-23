@@ -30,7 +30,8 @@ from captum.attr import (
     LRP,
     InputXGradient,
     GuidedBackprop,
-    Deconvolution
+    Deconvolution,
+    ShapleyValueSampling
 )
 
 # Add project root to path for imports
@@ -52,12 +53,12 @@ def parse_args():
     
     # Explanation methods
     parser.add_argument('--methods', type=str, nargs='+', 
-                       default=['integrated_gradients', 'saliency', 'gradcam'],
+                       default=['integrated_gradients', 'shapley_value_sampling', 'gradcam'],
                        choices=[
                            'integrated_gradients', 'saliency', 'gradient_shap',
                            'deeplift', 'deeplift_shap', 'gradcam', 'guided_gradcam',
                            'occlusion', 'lrp', 'input_x_gradient', 'guided_backprop',
-                           'deconvolution'
+                           'deconvolution', 'shapley_value_sampling'
                        ],
                        help='Attribution methods to use')
     
@@ -166,22 +167,40 @@ def load_model(model_name, checkpoint_path, device):
         raise ImportError(f"Could not import model '{model_name}' from models/{model_name}.py")
 
 
-def load_dataset(dataset_name, batch_size=1, num_workers=0):
+def load_dataset(dataset_name, batch_size=1, num_workers=0, data_dir=None):
     """Load dataset for explanation."""
     try:
         dataset_module = importlib.import_module(f'datasets.{dataset_name}')
         
         # Get test loader for explanation
         if hasattr(dataset_module, 'get_dataloaders'):
-            _, val_loader = dataset_module.get_dataloaders(
-                batch_size=batch_size, num_workers=num_workers
-            )
+            if data_dir is not None:
+                result = dataset_module.get_dataloaders(
+                    data_dir, batch_size=batch_size, num_workers=num_workers
+                )
+            else:
+                result = dataset_module.get_dataloaders(
+                    batch_size=batch_size, num_workers=num_workers
+                )
         elif hasattr(dataset_module, 'create_dataloaders'):
-            _, val_loader = dataset_module.create_dataloaders(
-                batch_size=batch_size, num_workers=num_workers
-            )
+            if data_dir is not None:
+                result = dataset_module.create_dataloaders(
+                    data_dir, batch_size=batch_size, num_workers=num_workers
+                )
+            else:
+                result = dataset_module.create_dataloaders(
+                    batch_size=batch_size, num_workers=num_workers
+                )
         else:
             raise ValueError(f"No suitable dataloader function found in {dataset_name}")
+        
+        # Handle different return formats
+        if len(result) == 2:
+            _, val_loader = result
+        elif len(result) == 3:
+            _, val_loader, _ = result
+        else:
+            raise ValueError(f"Unexpected return format from dataset {dataset_name}")
         
         return val_loader
         
@@ -246,6 +265,8 @@ def create_attribution_method(method_name, model, device):
         return GuidedBackprop(model)
     elif method_name == 'deconvolution':
         return Deconvolution(model)
+    elif method_name == 'shapley_value_sampling':
+        return ShapleyValueSampling(model)
     else:
         raise ValueError(f"Unknown attribution method: {method_name}")
 
@@ -439,7 +460,11 @@ def main():
         
         # Load dataset
         print(f"Loading dataset: {args.dataset}")
-        val_loader = load_dataset(args.dataset, batch_size=args.batch_size)
+        # For imagenets50, pass the data directory
+        data_dir = None
+        if args.dataset == 'imagenets50':
+            data_dir = 'data/imagenets50'
+        val_loader = load_dataset(args.dataset, batch_size=args.batch_size, data_dir=data_dir)
         
         # Get class names if available
         class_names = getattr(val_loader.dataset, 'classes', None)
